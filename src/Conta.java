@@ -50,6 +50,7 @@ public class Conta{
         }
       }
 
+
     //depositar
     public boolean depositar(double deposito) {
         if (deposito > 0) {
@@ -64,7 +65,7 @@ public class Conta{
     public boolean transferir(Conta conta, double valor) {
         if (this.saque(valor)) {
           conta.depositar(valor);
-          return false;
+          return true;
         }
         return false;                              
     }
