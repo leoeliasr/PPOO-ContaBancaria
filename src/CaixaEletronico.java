@@ -20,7 +20,8 @@ public class CaixaEletronico {
         System.out.println("4 - Sacar");
         System.out.println("5 - Transferir");
         System.out.println("6 - Contas existe");
-        System.out.println("7 - Sair");
+        System.out.println("7 - Apagar conta");
+        System.out.println("8 - Sair");
     }
 
     public void controlarCaixa() {
@@ -29,7 +30,7 @@ public class CaixaEletronico {
             menu();
             opcao = Integer.parseInt(scanner.nextLine());
             opcaoMenu(opcao);
-        } while (opcao != 7);
+        } while (opcao != 8);
     }
 
     private void opcaoMenu(int opcao) {
@@ -52,14 +53,43 @@ public class CaixaEletronico {
                 listarContas();
                 break;
             case 7:
+                apagarConta();
+                break;
+            case 8:
                 break;
         }
+    }
+
+    private int getIndexListaContas(int numConta) {
+        for (int i = 0; i < contas.size(); i++) {
+            if (contas.get(i).getNumConta() == numConta) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     private int pedirNumeroConta() {
         System.out.println("Número da conta:");
         int numConta = Integer.parseInt(scanner.nextLine());
         return numConta;
+    }
+
+    private void apagarConta() {
+        System.out.println("Número da conta a ser apagada:");
+        int numConta = Integer.parseInt(scanner.nextLine());
+        int index = getIndexListaContas(numConta);
+        Conta conta = buscarContaPorNumero(numConta);
+        if (conta.getSaldo() == 0) {
+            contas.remove(index);
+            System.out.println("Conta apagada");
+        }
+        else if (conta.getSaldo() > 0) {
+            System.out.println("Não é possível apagar conta com saldo positivo");
+        }
+        else {
+            System.out.println("Não é possível apagar conta com saldo negativo");
+        }
     }
 
     private void listarContas() {
