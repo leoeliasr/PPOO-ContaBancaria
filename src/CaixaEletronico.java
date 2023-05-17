@@ -1,15 +1,17 @@
 package src;
 
 import java.util.Scanner;
+import java.util.ArrayList;
 public class CaixaEletronico {
-    private Conta contaA;
-    private Conta contaB;
+   
+    private ArrayList<Conta> contas;
     private Scanner scanner;
 
     public CaixaEletronico() {
+        contas = new ArrayList<>();
         scanner = new Scanner(System.in);
     }
-
+    
     private void menu() {
         System.out.println("Digite a opção desejada:");
         System.out.println("1 - Criar Contas");
@@ -17,8 +19,9 @@ public class CaixaEletronico {
         System.out.println("3 - Depositar");
         System.out.println("4 - Sacar");
         System.out.println("5 - Transferir");
-        System.out.println("6 - Sair");
-     }
+        System.out.println("6 - Contas existe");
+        System.out.println("7 - Sair");
+    }
 
     public void controlarCaixa() {
         int opcao = 0;
@@ -26,50 +29,57 @@ public class CaixaEletronico {
             menu();
             opcao = Integer.parseInt(scanner.nextLine());
             opcaoMenu(opcao);
-        } while (opcao != 6);
+        } while (opcao != 7);
     }
 
     private void opcaoMenu(int opcao) {
-        int numConta;
         switch (opcao) {
             case 1:
-                System.out.println("Criando conta A...");
-                contaA = criarConta();
-                System.out.println("Criando conta B...");
-                contaB = criarConta();
+                criarConta();
                 break;
-            case 2:
-                System.out.println("Número da conta:");
-                numConta = Integer.parseInt(scanner.nextLine());
-                if (numConta == contaA.getNumConta()) consultarsaldo(contaA);
-                else if (numConta == contaB.getNumConta()) consultarsaldo(contaB);
-                break;
+            case 2:  
+                consultarSaldo();
             case 3:
-                System.out.println("Número da conta:");
-                numConta = Integer.parseInt(scanner.nextLine());
-                if (numConta == contaA.getNumConta()) depositar(contaA);
-                else if (numConta == contaB.getNumConta()) depositar(contaB);
+                depositar();
                 break;
             case 4:
-                System.out.println("Número da conta:");
-                numConta = Integer.parseInt(scanner.nextLine());
-                if (numConta == contaA.getNumConta()) sacar(contaA);
-                else if (numConta == contaB.getNumConta()) sacar(contaB);
+                sacar();
                 break;
             case 5:
-                System.out.println("Número da conta que irá transferir:");
-                numConta = Integer.parseInt(scanner.nextLine());
-                System.out.println("Valor:");
-                double valor = Double.parseDouble(scanner.nextLine());
-                if (numConta == contaA.getNumConta()) contaA.transferir(contaB, valor);
-                else if (numConta == contaB.getNumConta()) contaB.transferir(contaA, valor);
+                transferir();
                 break;
             case 6:
+                listarContas();
+                break;
+            case 7:
                 break;
         }
     }
 
+    private int pedirNumeroConta() {
+        System.out.println("Número da conta:");
+        int numConta = Integer.parseInt(scanner.nextLine());
+        return numConta;
+    }
+
+    private void listarContas() {
+        System.out.println("Contas existentes:");
+        for (Conta conta : contas){
+            System.out.println(conta.getNumConta() + " - " + conta.getNomeCliente());
+        }
+    }
+
+    private Conta buscarContaPorNumero (int numContaBuscada){
+        for (Conta conta : contas){
+            if (conta.getNumConta() == numContaBuscada) {
+                return conta; // encontrou conta com número buscado
+            }
+        }
+        return null; // conta com número buscado não existente
+    }
+
     private Conta criarConta() {
+        System.out.println("Criando conta ...");
         System.out.println("1. Criar conta com saldo inicial");
         System.out.println("2. Criar conta sem saldo inicial");
         int opcao = Integer.parseInt(scanner.nextLine());
@@ -112,22 +122,51 @@ public class CaixaEletronico {
         return conta;
     }
 
-    private void consultarsaldo(Conta conta) {
-        System.out.println("Titular: " + conta.getNomeCliente() + " Saldo: " + conta.getSaldo());
+    private void consultarSaldo() {
+        int numConta = pedirNumeroConta();
+        Conta conta = buscarContaPorNumero(numConta);
+        if (conta != null) {
+            System.out.println("Titular: " + conta.getNomeCliente() + " Saldo: " + conta.getSaldo());
+        } 
+        else {
+            System.out.println("Conta não existente");
+        }
     }
 
-    private void depositar(Conta conta) {
+    private void depositar() {
+        int numConta = pedirNumeroConta();
+        Conta conta = buscarContaPorNumero(numConta);
         System.out.println("Valor a ser depositado: ");
         double valor = Double.parseDouble(scanner.nextLine());
         conta.depositar(valor);
     }
 
-    private void sacar(Conta conta) {
+    private void sacar() {
+        int numConta = pedirNumeroConta();
+        Conta conta = buscarContaPorNumero(numConta);
         System.out.println("Valor a ser sacado: ");
         double valor = Double.parseDouble(scanner.nextLine());
-        conta.saque(valor);
+        conta.depositar(valor);
     }
   
+    private void transferir() {
+        System.out.println("Número da conta que irá transferir:");
+        int numContaA = Integer.parseInt(scanner.nextLine());
+        Conta contaA = buscarContaPorNumero(numContaA);
+        System.out.println("Número da conta que irá receber:");
+        int numContaB = Integer.parseInt(scanner.nextLine());
+        System.out.println("Valor:");
+        double valor = Double.parseDouble(scanner.nextLine());
+        Conta contaB = buscarContaPorNumero(numContaB);
+        if (contaA != null && contaB != null) {
+            if (contaA.transferir(contaB, valor)) {
+                System.out.println("Valor transferido");
+            }
+            else {
+                System.out.println("Valor não transferido");
+
+            }
+        }
+    }
 
 }
-    
